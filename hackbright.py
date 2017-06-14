@@ -56,7 +56,7 @@ def show_all_project():
     """Show all projects."""
 
     QUERY = """
-        SELECT title
+        SELECT title, description, max_grade
         FROM Projects
         """
     db_cursor = db.session.execute(QUERY)
@@ -123,8 +123,8 @@ def get_grade_by_github_title(github, title):
 
     row = db_cursor.fetchone()
 
-    print "Student {acct} in project {title} received grade of {grade}".format(
-        acct=github, title=title, grade=row[0])
+    # print "Student {acct} in project {title} received grade of {grade}".format(
+    #     acct=github, title=title, grade=row[0])
 
     return row
 
@@ -144,6 +144,25 @@ def assign_grade(github, title, grade):
     db.session.commit()
 
     print "Successfully assigned grade of {grade} for {acct} in {title}".format(
+        grade=grade, acct=github, title=title)
+
+
+def update_grade(github, title, grade):
+    """Update a student's grade on an assignment and print a confirmation."""
+
+    QUERY = """
+        UPDATE Grades
+          SET grade=:grade
+          WHERE student_github=:github AND project_title=:title
+        """
+
+    db_cursor = db.session.execute(QUERY, {'github': github,
+                                           'title': title,
+                                           'grade': grade})
+
+    db.session.commit()
+
+    print "Successfully updated grade to {grade} for {acct} in {title}".format(
         grade=grade, acct=github, title=title)
 
 
@@ -185,6 +204,26 @@ def get_grades_by_title(title):
             acct=row[0], grade=row[1], title=title)
 
     return rows
+
+
+def make_new_project(title, description, maxgrade):
+    """Add a new project and print confirmation.
+
+    Given a title,description and max_grade, add project to the
+    database and print a confirmation message.
+    """
+
+    QUERY = """
+        INSERT INTO projects (title, description, max_grade)
+          VALUES (:title, :description, :maxgrade)
+        """
+
+    db.session.execute(QUERY, {'title': title,
+                               'description': description,
+                               'maxgrade': maxgrade})
+    db.session.commit()
+
+    print "Successfully added project: {title}".format(title=title)
 
 
 def handle_input():

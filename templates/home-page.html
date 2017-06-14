@@ -14,7 +14,7 @@
 
   <h1>Projects</h1>
     <ul>
-    {% for (title,) in projectlist %}
+    {% for title, description, maxgrade in projectlist %}
     <li><a href="project?title={{ title }}"> {{ title }} </a> </li>
     {% endfor %}
     </ul>

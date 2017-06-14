@@ -6,6 +6,13 @@ import hackbright
 
 app = Flask(__name__)
 
+@app.route("/")
+def home_page():
+    students_list = hackbright.show_all_student()
+    projects_list = hackbright.show_all_project()
+
+    return render_template("home-page.html", studentlist= students_list, projectlist=projects_list )
+    
 
 @app.route("/student-search")
 def get_student_form():
@@ -42,8 +49,8 @@ def student_add():
 def student_add_success():
 
     github = request.form.get('github')
-    last_name = request.form.get('lastname')
-    first_name = request.form.get('firstname')
+    description = request.form.get('lastname')
+    first_name = request.form.get('maxgrade')
 
     hackbright.make_new_student(first_name, last_name, github)
 
@@ -67,13 +74,58 @@ def show_project():
                            grades_list=grades_list)
 
 
-@app.route("/")
-def home_page():
+
+
+@app.route("/project-add")
+def project_add():
+    """Add a student."""
+
+    return render_template('project_add.html')
+
+
+@app.route("/project-add", methods=['POST'])
+def project_add_success():
+
+    title = request.form.get('title')
+    description = request.form.get('description')
+    maxgrade = request.form.get('maxgrade')
+
+    hackbright.make_new_project(title, description, maxgrade)
+
+    return render_template('project_add_success.html', title=title)
+
+
+
+@app.route("/assign-grade")
+def assign_grade():
     students_list = hackbright.show_all_student()
     projects_list = hackbright.show_all_project()
 
-    return render_template("home-page.html", studentlist= students_list, projectlist=projects_list )
+    return render_template("assign_grade.html", studentlist= students_list,
+                            projectlist=projects_list)
     
+@app.route("/assign-grade", methods=["POST"])
+def grade_assigned():
+
+    github = request.form.get('student')
+
+    title = request.form.get('project')
+
+    new_grade = request.form.get('grade')
+
+    project_grade = hackbright.get_grade_by_github_title(github, title)
+   
+    print github, title,project_grade
+
+    if project_grade:
+        hackbright.update_grade(github, title, new_grade)
+
+    else:
+        hackbright.assign_grade(github, title, new_grade)
+
+    return render_template("grade_assigned.html")
+
+
 
 
 if __name__ == "__main__":

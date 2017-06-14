@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>Assign a Grade</title>
+</head>
+<body>
+ <form action="/assign-grade" method="POST">
+ <select name="student">
+   {% for firstname, lastname, github in studentlist %}
+   <option value="{{ github }}">{{ firstname }}  {{ lastname }}</option>
+   {% endfor %}
+  </select>
+
+  <select name="project">
+   {% for title, description, maxgrade in projectlist %}
+   <option value="{{ title }}">{{ title }} {{maxgrade}}</option>
+   {% endfor %}
+  </select>
+
+  Assigned grade: <input type="number" name="grade">
+
+  <input type="submit" name="submit">
+
+</form>
+
+</body>
+</html>
